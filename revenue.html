@@ -97,15 +97,30 @@
 
                 const revenueRecord = { date, deviceName, softwareName, coinAmount, revenue };
                 let revenues = JSON.parse(localStorage.getItem('revenues')) || [];
-                revenues.push(revenueRecord);
+                                const existingIndex = revenues.findIndex(r => 
+                    r.date === date && 
+                    r.deviceName === deviceName && 
+                    r.softwareName === softwareName
+                );
+
+                if (existingIndex > -1) {
+                    // Replace existing record
+                    revenues[existingIndex] = revenueRecord;
+                } else {
+                    // Add new record
+                    revenues.push(revenueRecord);
+                }
+
                 localStorage.setItem('revenues', JSON.stringify(revenues));
 
-
-            loadRevenues();
+                loadRevenues();
                 this.reset();
             });
 
             loadRevenues(); // 在页面加载时调用，确保数据持久化
+
+            // Populate device and software dropdowns
+            populateDropdowns();
         });
 
         function deleteRevenue(index) {
@@ -130,6 +145,30 @@
             `).join('');
         }
 
+
+        // Function to populate device and software dropdowns
+        function populateDropdowns() {
+            const deviceSelect = document.getElementById('deviceName');
+            const softwareSelect = document.getElementById('softwareName');
+
+            // Load devices from localStorage
+            const devices = JSON.parse(localStorage.getItem('devices')) || [];
+            devices.forEach(device => {
+                const option = document.createElement('option');
+                option.value = device.deviceName;
+                option.textContent = device.deviceName;
+                deviceSelect.appendChild(option);
+            });
+
+            // Load softwares from localStorage
+            const softwares = JSON.parse(localStorage.getItem('softwares')) || [];
+            softwares.forEach(software => {
+                const option = document.createElement('option');
+                option.value = software.softwareName;
+                option.textContent = software.softwareName;
+                softwareSelect.appendChild(option);
+            });
+        }
 
     </script>
     <script src="script.js"></script>
